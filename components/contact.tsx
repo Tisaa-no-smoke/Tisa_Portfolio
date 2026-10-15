@@ -29,6 +29,9 @@ export function Contact() {
             </a>
             {socials.map((s) => (
               <a key={s.label} href={s.href} target="_blank" rel="noreferrer" className="btn btn-plain flex-1 justify-center sm:flex-none">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" className="shrink-0" aria-hidden>
+                  <path d={s.logo.path} />
+                </svg>
                 {s.label} <span aria-hidden>↗</span>
               </a>
             ))}

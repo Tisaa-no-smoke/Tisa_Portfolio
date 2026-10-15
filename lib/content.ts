@@ -21,6 +21,7 @@ import {
   siReact,
   siSqlite,
   siTailwindcss,
+  siTelegram,
   siThreedotjs,
   siTypescript,
   type SimpleIcon,
@@ -39,8 +40,9 @@ export const profile = {
   phoneHref: "tel:+85578640648",
 };
 
-export const socials = [
-  { label: "GitHub", href: "https://github.com/" }, // TODO: your GitHub profile
+export const socials: { label: string; href: string; logo: SimpleIcon }[] = [
+  { label: "Telegram", href: "https://t.me/kuntisa12", logo: siTelegram },
+  { label: "GitHub", href: "https://github.com/Tisaa-no-smoke", logo: siGithub },
 ];
 
 export type Accent = "yellow" | "pink" | "blue" | "mint";
