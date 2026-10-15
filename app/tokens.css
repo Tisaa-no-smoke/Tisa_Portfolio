@@ -1,0 +1,66 @@
+/* Tisa Neobrutal — design tokens
+   Fonts are loaded with next/font in app/layout.tsx, which sets the
+   --font-*-src variables used below. */
+
+:root {
+  /* color — light */
+  --paper: #FFF6E5;
+  --surface: #FFFFFF;
+  --ink: #111111;
+  --ink-muted: #4A4540;
+  --yellow: #FFD23F;
+  --pink: #FF6B9D;
+  --blue: #4D7CFE;
+  --mint: #3DDC97;
+  --on-accent: #111111;
+
+  /* type */
+  --font-display: var(--font-archivo-src), "Archivo Black", "Arial Black", system-ui, sans-serif;
+  --font-sans: var(--font-grotesk-src), "Space Grotesk", system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-src), "JetBrains Mono", ui-monospace, monospace;
+  --font-pixel: var(--font-pixel-src), "Silkscreen", ui-monospace, monospace;
+  --font-pixel-tall: var(--font-jersey-src), "Jersey 10", var(--font-pixel-src), ui-monospace, monospace;
+  --font-khmer: var(--font-kantumruy-src), "Kantumruy Pro", var(--font-grotesk-src), system-ui, sans-serif;
+
+  /* spacing */
+  --space-2: 8px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-10: 40px;
+
+  /* radius */
+  --radius-none: 0px;
+  --radius-sm: 6px;
+  --radius-pill: 999px;
+
+  /* borders & hard shadows */
+  --border-thick: 3px;
+  --border-thin: 2px;
+  --offset-sm: 3px;
+  --offset-md: 6px;
+  --offset-lg: 10px;
+}
+
+[data-theme="dark"] {
+  --paper: #141414;
+  --surface: #1F1F1F;
+  --ink: #FFF6E5;
+  --ink-muted: #BDB5A8;
+}
+
+/* type styles */
+.display-xl { font-family: var(--font-display); font-size: 96px; line-height: 0.92; }
+.heading    { font-family: var(--font-display); font-size: 40px; line-height: 44px; }
+.title      { font-family: var(--font-sans); font-size: 24px; line-height: 30px; font-weight: 700; }
+.body       { font-family: var(--font-sans); font-size: 17px; line-height: 26px; }
+.label      { font-family: var(--font-mono); font-size: 13px; line-height: 16px; font-weight: 700; text-transform: uppercase; }
+.body-khmer { font-family: var(--font-khmer); font-size: 17px; line-height: 30px; font-weight: 500; }
+
+/* the core neobrutal recipe */
+.brutal {
+  border: var(--border-thick) solid var(--ink);
+  box-shadow: var(--offset-md) var(--offset-md) 0 var(--ink);
+  transition: transform 140ms, box-shadow 140ms;
+}
+.brutal:hover  { transform: translate(-2px, -2px); box-shadow: var(--offset-lg) var(--offset-lg) 0 var(--ink); }
+.brutal:active { transform: translate(var(--offset-md), var(--offset-md)); box-shadow: 0 0 0 var(--ink); }

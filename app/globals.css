@@ -1,0 +1,421 @@
+@import "tailwindcss";
+@import "./tokens.css" layer(components);
+
+/* Expose tokens as Tailwind utilities: bg-paper, text-ink, border-ink, bg-yellow … */
+@theme inline {
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-yellow: var(--yellow);
+  --color-pink: var(--pink);
+  --color-blue: var(--blue);
+  --color-mint: var(--mint);
+  --color-on-accent: var(--on-accent);
+  --font-km: var(--font-khmer);
+  --font-heading: var(--font-display);
+}
+
+html {
+  overflow-x: clip;
+  scroll-behavior: smooth;
+  scroll-padding-top: 140px;
+  color-scheme: light;
+}
+html[data-theme="dark"] { color-scheme: dark; }
+@media (min-width: 768px) { html { scroll-padding-top: 104px; } }
+
+body {
+  overflow-x: clip; /* tilted stickers and the ticker poke past the edges */
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  /* corkboard dot grid */
+  background-image: radial-gradient(color-mix(in srgb, var(--ink) 14%, transparent) 1.2px, transparent 1.2px);
+  background-size: 22px 22px;
+}
+
+::selection { background: var(--yellow); color: var(--on-accent); }
+
+:focus-visible {
+  outline: var(--border-thick) solid var(--blue);
+  outline-offset: 3px;
+}
+
+@layer components {
+/* responsive type scale on top of the token styles */
+@media (max-width: 900px) {
+  .display-xl { font-size: clamp(44px, 12vw, 96px); }
+  .heading { font-size: 32px; line-height: 36px; }
+}
+@media (max-width: 480px) {
+  .title { font-size: 21px; line-height: 27px; }
+}
+
+.display-khmer {
+  font-family: var(--font-khmer);
+  font-weight: 700;
+  font-size: clamp(56px, 12vw, 128px);
+  line-height: 1.3;
+}
+
+/* sticker cards: tilted on the board, straighten + lift on hover */
+.sticker {
+  transform: rotate(var(--tilt, 0deg));
+}
+.sticker:hover {
+  transform: rotate(0deg) translate(-2px, -2px);
+}
+.sticker:active {
+  transform: rotate(0deg) translate(var(--offset-md), var(--offset-md));
+}
+
+/* a strip of masking tape across the top of a sticker */
+.tape::before {
+  content: "";
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  width: 96px;
+  height: 26px;
+  transform: translateX(-50%) rotate(-3deg);
+  background: color-mix(in srgb, var(--yellow) 70%, transparent);
+  border: var(--border-thin) solid var(--ink);
+  z-index: 2;
+}
+
+/* buttons: hard shadow that presses down like a key */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 22px;
+  border: var(--border-thick) solid var(--ink);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--offset-sm) var(--offset-sm) 0 var(--ink);
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 17px;
+  line-height: 1;
+  color: var(--on-accent);
+  background: var(--yellow);
+  transition: transform 120ms, box-shadow 120ms;
+  cursor: pointer;
+}
+.btn:hover { transform: translate(-2px, -2px); box-shadow: var(--offset-md) var(--offset-md) 0 var(--ink); }
+.btn:active { transform: translate(var(--offset-sm), var(--offset-sm)); box-shadow: 0 0 0 var(--ink); }
+.btn-plain { background: var(--surface); color: var(--ink); }
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: var(--border-thin) solid var(--ink);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--ink);
+}
+
+/* scrolling stack ticker */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.marquee-track { animation: marquee 32s linear infinite; }
+
+@keyframes blink { 50% { opacity: 0.25; } }
+.status-dot { animation: blink 1.4s steps(1) infinite; }
+
+/* ---------- hero photo board ---------- */
+.stud {
+  --stud-hi: inset 0 0 0 3px color-mix(in srgb, var(--surface) 55%, transparent);
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  border: var(--border-thin) solid var(--ink);
+  box-shadow: var(--stud-hi);
+}
+/* the car presses each stud flat as it drives over; it pops back up behind the car.
+   Same 14s loop as `drive`; each stud's delay is set inline from where it sits on the border. */
+.stud-press { animation: stud-press 14s linear infinite; }
+@keyframes stud-press {
+  0%        { scale: 1;    box-shadow: var(--stud-hi); }
+  1%, 8.5%  { scale: 0.7;  box-shadow: inset 0 0 0 8px var(--ink); }
+  10%       { scale: 1.3;  box-shadow: var(--stud-hi); }
+  12%, 100% { scale: 1;    box-shadow: var(--stud-hi); }
+}
+
+/* pop-art misprint of the photo: a halftone pink silhouette offset behind it */
+.pop-shadow {
+  position: absolute;
+  /* the photo's box (pt-6), nudged left and down; offset with inset so GSAP's x/y stay free for the mouse */
+  inset: 32px 16px -8px -16px;
+  background-color: var(--pink);
+  background-image: radial-gradient(color-mix(in srgb, var(--on-accent) 30%, transparent) 1.3px, transparent 1.6px);
+  background-size: 6px 6px;
+  mask: url("/tisa-silhouette.webp") bottom center / contain no-repeat;
+}
+
+/* split-flap label: words stack in one cell (so the tag keeps the widest word's size) and flip in steps */
+.flap { display: grid; perspective: 240px; }
+.flap > span {
+  grid-area: 1 / 1;
+  backface-visibility: hidden;
+  animation: flap var(--flap-period, 9s) infinite;
+}
+@keyframes flap {
+  0%            { transform: rotateX(-90deg); opacity: 1; animation-timing-function: steps(3, end); }
+  4%            { transform: rotateX(0deg); }
+  30%           { transform: rotateX(0deg); animation-timing-function: steps(3, end); }
+  33.3%         { transform: rotateX(90deg); opacity: 1; }
+  33.4%, 100%   { transform: rotateX(90deg); opacity: 0; }
+}
+.board-grid {
+  background-image: radial-gradient(color-mix(in srgb, var(--on-accent) 22%, transparent) 1.5px, transparent 1.5px);
+  background-size: 20px 20px;
+}
+
+/* the car follows the border clockwise; edge times are weighted by the 4:5 aspect */
+.car {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 46px;
+  height: 30px;
+  translate: -50% -50%;
+  scale: 1.45;
+  animation: drive 14s linear infinite;
+}
+@keyframes drive {
+  0%    { left: 0%;   top: 0%;   rotate: 0deg; }
+  19.6% { left: 100%; top: 0%;   rotate: 0deg; }
+  22.6% { left: 100%; top: 0%;   rotate: 90deg; }
+  47%   { left: 100%; top: 100%; rotate: 90deg; }
+  50%   { left: 100%; top: 100%; rotate: 180deg; }
+  69.6% { left: 0%;   top: 100%; rotate: 180deg; }
+  72.6% { left: 0%;   top: 100%; rotate: 270deg; }
+  97%   { left: 0%;   top: 0%;   rotate: 270deg; }
+  100%  { left: 0%;   top: 0%;   rotate: 360deg; }
+}
+.car-beam {
+  position: absolute;
+  left: 40px;
+  top: 50%;
+  width: 54px;
+  height: 34px;
+  translate: 0 -50%;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--yellow) 75%, transparent), transparent);
+  clip-path: polygon(0 35%, 100% 0, 100% 100%, 0 65%);
+}
+.car-puff {
+  position: absolute;
+  left: -6px;
+  top: 50%;
+  width: 9px;
+  height: 9px;
+  margin-top: -4.5px;
+  border-radius: 999px;
+  border: var(--border-thin) solid var(--ink);
+  background: var(--surface);
+  animation: puff 0.9s linear infinite;
+}
+@keyframes puff {
+  from { translate: 0 0; scale: 0.6; opacity: 1; }
+  to   { translate: -26px 0; scale: 1.3; opacity: 0; }
+}
+
+/* tags float gently */
+.bob { animation: bob 3.2s ease-in-out infinite; }
+@keyframes bob {
+  0%, 100% { translate: 0 0; rotate: -2deg; }
+  50%      { translate: 0 -8px; rotate: 1.5deg; }
+}
+
+/* ---------- skill bricks ---------- */
+/* A bright "island" that stays light in both themes: dark ink, white bricks. */
+.light-island {
+  --ink: var(--on-accent);
+  --surface: white;
+  color: var(--on-accent);
+}
+/* baseplates are a pale tint of their category color, with studs in a deeper shade */
+.baseplate {
+  --plate: var(--yellow);
+  background-color: color-mix(in srgb, var(--plate) 38%, white);
+  background-image: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--plate) 70%, var(--on-accent) 12%) 4px,
+    transparent 4.5px
+  );
+  background-size: 24px 24px;
+  background-position: 6px 6px;
+}
+.plate-yellow { --plate: var(--yellow); }
+.plate-pink   { --plate: var(--pink); }
+.plate-blue   { --plate: var(--blue); }
+.plate-mint   { --plate: var(--mint); }
+
+/* ---------- pixel wordmark ---------- */
+.logo-pixel {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 4px;
+  font-family: var(--font-pixel);
+  line-height: 1;
+}
+.logo-pixel-name {
+  font-family: var(--font-pixel-tall);
+  font-size: 40px;
+  letter-spacing: 0.04em;
+  line-height: 0.8;
+  color: color-mix(in srgb, var(--pink) 72%, black);
+}
+[data-theme="dark"] .logo-pixel-name { color: var(--pink); }
+@media (max-width: 374px) {
+  .logo-pixel-name { font-size: 32px; }
+  .logo-pixel-tag { font-size: 9px; padding: 2px 4px 1px; }
+}
+.logo-pixel-tag {
+  margin-top: -6px;
+  padding: 3px 5px 2px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--on-accent);
+  background: var(--yellow);
+  border: var(--border-thin) solid var(--ink);
+  box-shadow: 2px 2px 0 var(--ink);
+  rotate: -4deg;
+  transition: rotate 140ms, translate 140ms;
+}
+a:hover > .logo-pixel .logo-pixel-tag,
+.logo-pixel:hover .logo-pixel-tag { rotate: 4deg; translate: 0 -2px; }
+
+/* ---------- ID badge (contact) ---------- */
+.badge-strap {
+  background: repeating-linear-gradient(
+    -55deg,
+    var(--on-accent) 0 22px,
+    var(--pink) 22px 28px,
+    var(--yellow) 28px 34px,
+    var(--blue) 34px 40px
+  );
+}
+.badge-studs {
+  background-image: radial-gradient(circle, var(--yellow) 3px, var(--on-accent) 3.5px 5.5px, transparent 6px);
+  background-size: 22px 100%;
+  background-position: 6px center;
+}
+.badge-bottom {
+  background:
+    radial-gradient(circle, transparent 3px, var(--on-accent) 3.5px 5.5px, transparent 6px) 6px center / 22px 100%,
+    linear-gradient(90deg, var(--yellow) 0 72%, var(--pink) 72%);
+}
+.badge-name-accent { color: color-mix(in srgb, var(--pink) 72%, black); }
+
+/* ---------- intro ---------- */
+html[data-intro="play"] { overflow: hidden; }
+html:not([data-intro="play"]) .intro { display: none; }
+.intro-dots {
+  background-image: radial-gradient(color-mix(in srgb, var(--ink) 14%, transparent) 1.2px, transparent 1.2px);
+  background-size: 22px 22px;
+}
+.intro-brick .brick-studs { top: calc(-1 * clamp(9px, 2vw, 16px)); left: 16%; right: 16%; }
+.intro-brick .brick-studs span { width: clamp(12px, 3.6vw, 34px); height: clamp(9px, 2vw, 16px); }
+.intro-car {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 46px;
+  height: 30px;
+  translate: 0 -50%;
+  scale: 1.5;
+}
+@media (min-width: 768px) { .intro-car { scale: 2.2; } }
+
+.hazard {
+  height: 16px;
+  background: repeating-linear-gradient(-45deg, var(--on-accent) 0 12px, var(--yellow) 12px 24px);
+  border-bottom: var(--border-thick) solid var(--on-accent);
+}
+.brick {
+  --brick: var(--surface);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px 8px 8px;
+  background: var(--brick);
+  border: var(--border-thick) solid var(--ink);
+  box-shadow: 4px 4px 0 var(--ink);
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 1;
+  transition: translate 140ms, rotate 140ms, box-shadow 140ms;
+}
+.brick:hover { translate: 0 -5px; rotate: -2deg; box-shadow: 6px 10px 0 var(--ink); }
+.brick:active { translate: 4px 4px; rotate: 0deg; box-shadow: 0 0 0 var(--ink); }
+/* labels are a deep shade of the brick's own color (all ≥ 4.5:1 contrast) */
+.brick { color: var(--brick-ink, var(--ink)); }
+.brick-yellow { --brick: var(--yellow); --brick-ink: color-mix(in srgb, var(--yellow) 38%, black); }
+.brick-pink   { --brick: var(--pink);   --brick-ink: color-mix(in srgb, var(--pink) 30%, black); }
+.brick-blue   { --brick: var(--blue);   --brick-ink: color-mix(in srgb, var(--blue) 20%, black); }
+.brick-mint   { --brick: var(--mint);   --brick-ink: color-mix(in srgb, var(--mint) 30%, black); }
+/* white bricks take the shade of whatever they sit on */
+.plate-mint .brick-surface { --brick-ink: color-mix(in srgb, var(--mint) 45%, black); }
+.on-yellow .brick-surface  { --brick-ink: color-mix(in srgb, var(--yellow) 45%, black); }
+.brick-studs {
+  position: absolute;
+  top: -11px;
+  left: 10px;
+  right: 10px;
+  display: flex;
+  justify-content: space-around;
+  pointer-events: none;
+}
+.brick-studs span {
+  width: 16px;
+  height: 11px;
+  background: var(--brick);
+  border: var(--border-thick) solid var(--ink);
+  border-bottom: 0;
+  border-radius: 4px 4px 0 0;
+}
+.brick-badge {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  border: var(--border-thin) solid var(--ink);
+  background: white;
+  color: var(--on-accent);
+}
+.brick-wip { border-style: dashed; }
+.brick-wip .brick-studs span { border-style: dashed; }
+
+/* bricks drop onto the baseplate as it scrolls into view */
+@supports (animation-timeline: view()) {
+  .brick {
+    animation: brick-drop linear both;
+    animation-timeline: view();
+    animation-range: entry calc(var(--i, 0) * 6%) entry calc(45% + var(--i, 0) * 6%);
+  }
+}
+@keyframes brick-drop {
+  from { transform: translateY(-36px); opacity: 0; }
+  to   { transform: none; opacity: 1; }
+}
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .marquee-track, .status-dot, .bob, .car-puff { animation: none; }
+  .car { animation: none; left: 100%; top: 100%; rotate: 180deg; }
+  .brutal, .btn, .sticker, .brick { transition: none; }
+  .brick { animation: none; }
+  .stud-press, .flap > span { animation: none; }
+  .flap > span:not(:first-child) { visibility: hidden; }
+}
